@@ -2,18 +2,19 @@ require 'color_text'
 require 'pry'
 
 class Ttt_game
+    attr_reader :cpu_symbo, :user_symbo, :active_turn, :game_over, :user_score, :cpu_score
+    attr_accessor :board
     def initialize
         @cpu_symbo = ''
         @user_symbo = ''
 
         @board = nil
-        @active_turn = ''
-        @choice = ''
+        @active_turn = nil
         @game_over = false
         # if your can restart then it make sense to add score tracking
         @user_score = 0
         @cpu_score = 0
-
+        @choice = ''
     end
 
     def assign_player_symbo
@@ -29,18 +30,15 @@ class Ttt_game
         @cpu_symbo = @user_symbo == 'X' ? 'O' : 'X'
         puts `clear`
         # X make the first move
-        create_game(@user_symbo == 'X')
     end
 
-    def create_game(user_goes_first)
+    def create_game
         # the tic tac toe slots; After one game, if chose to play again this will clear the board
         @board = {
             a1: ' ', a2: ' ', a3: ' ',
             b1: ' ', b2: ' ', b3: ' ',
             c1: ' ', c2: ' ', c3: ' '
         }
-
-        user_goes_first ? user_turn : cpu_turn
     end
 
     def user_turn
@@ -49,9 +47,7 @@ class Ttt_game
 
         puts " Please specify a move with the format 'A1' , 'B3' , 'C2' etc.\n or type 'exit' to quit".red
         STDOUT.flush
-
         input = gets.chomp.downcase.to_sym
-        put_bar
 
         # force user input
         if
@@ -67,7 +63,7 @@ class Ttt_game
         else
             wrong_input unless input == :exit
         end
-  end
+    end
 
     def cpu_turn
         @active_turn = 'cpu'
@@ -89,7 +85,8 @@ class Ttt_game
     end
 
     def draw_game
-        puts " Scores   Computer:#{@cpu_score} Player:#{@user_score}".gray
+        puts `clear`
+        puts " Scores   Computer:#{@cpu_score} Player:#{@user_score}\n\n".gray
         puts '      A   B   C'.red
         puts '    +---+---+---+'
         puts ' 1'.red + "  | #{@board[:a1].green} | #{@board[:b1].green} | #{@board[:c1].green} |"
@@ -102,9 +99,6 @@ class Ttt_game
         put_line
     end
 
-    def no_more_move?(board)
-        board.select { |_k, v| v == ' ' }.empty? ? true : false
-    end
 
     def score(board, depth)
         if win?(board, @cpu_symbo)
@@ -114,6 +108,10 @@ class Ttt_game
         else
             0
         end
+    end
+
+    def no_more_move?(board)
+        board.select { |_k, v| v == ' ' }.empty? ? true : false
     end
 
     def minimax(board, depth, player)
@@ -158,7 +156,7 @@ class Ttt_game
       #     @choice = moves[min_score_index]
       #     return scores[min_score_index]
       # end
-  end
+    end
 
     def wrong_input
         put_line
@@ -175,6 +173,8 @@ class Ttt_game
     end
 
     def win?(board, symbo)
+        # created nested array
+        # ex.[["X", " ", " "], [" ", " ", " "], [" ", " ", " "]]
         board_in_array = board.values.each_slice(3).to_a
         diagnoal_count = [0, 0]
         size = board_in_array[0].length
@@ -184,18 +184,20 @@ class Ttt_game
             ver_count = 0
             n = 0
             while n < size
-                # puts "this is the N loop: N = #{n}, cord = [#{i}, #{n}] symbo = #{board_in_array[i][n]}"
+                # check for horizontal & vertical win
                 (hor_count += 1) if symbo == board_in_array[i][n]
                 (ver_count += 1) if symbo == board_in_array[n][i]
-                if i == n
-                    # puts "When i == n: cord = [#{i}, #{n}] symbo = #{board_in_array[i][n]}"
-                    (diagnoal_count[0] += 1) if symbo == board_in_array[i][n]
+                # check for diagnoal win
+                if symbo == board_in_array[i][n]
+                    (diagnoal_count[0] += 1) if i == n
+                    (diagnoal_count[1] += 1) if i == size - 1 - n
                 end
-                if i == size - 1 - n
-                    # puts "cord = [#{i}, #{n}] symbo = #{board_in_array[i][n]}"
-                    (diagnoal_count[1] += 1) if symbo == board_in_array[i][n]
-                end
-                return true if hor_count == size || ver_count == size || diagnoal_count[0] == size || diagnoal_count[0] == size
+
+                return true if (hor_count == size)  ||
+                    (ver_count == size)             ||
+                    (diagnoal_count[0] == size)     ||
+                    (diagnoal_count[1] == size)
+
                 n += 1
             end
             i += 1
@@ -220,22 +222,22 @@ class Ttt_game
             @game_over = true
             ask_to_play_again
         end
-        if @game_over == false
-            moves_remain = board.values.select { |v| v == ' ' }.length
-            if moves_remain > 0
-                # switch turn
-                if symbo == @user_symbo
-                    cpu_turn
-                else
-                    user_turn
-                end
-            else
-                put_line
-                draw_game
-                puts "\n Game Over -- DRAW!\n".blue
-                ask_to_play_again
-            end
-        end
+        # if @game_over == false
+        #     moves_remain = board.values.select { |v| v == ' ' }.length
+        #     if moves_remain > 0
+        #         # switch turn
+        #         if symbo == @user_symbo
+        #             cpu_turn
+        #         else
+        #             user_turn
+        #         end
+        #     else
+        #         put_line
+        #         draw_game
+        #         puts "\n Game Over -- DRAW!\n".blue
+        #         ask_to_play_again
+        #     end
+        # end
     end
 
     def ask_to_play_again
