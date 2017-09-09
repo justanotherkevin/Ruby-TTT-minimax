@@ -14,7 +14,6 @@ class Ttt_game
         @user_score = 0
         @cpu_score = 0
 
-        assign_player_symbo
     end
 
     def assign_player_symbo
@@ -265,6 +264,3 @@ class Ttt_game
         puts ('#' * 80).red
     end
 end
-
-# start game
-Ttt_game.new
