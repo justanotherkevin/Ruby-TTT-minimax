@@ -1,6 +1,7 @@
 # Tic Tac Toe Ruby
 
 Bash script for tic tac toe game vs computer
+``` minmax is currently NOT working ```
 
 ## Getting Started
 
