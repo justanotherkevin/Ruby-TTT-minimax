@@ -105,4 +105,23 @@ describe Ttt_game do
 
     end
 
+    describe "Testing for full board" do
+        it "return true if there are no more moves to make" do
+            @game.board = {
+                a1: 'x', a2: 'o', a3: 'o',
+                b1: 'o', b2: 'x', b3: 'o',
+                c1: 'o', c2: 'o', c3: 'x'
+            }
+            expect(@game.no_more_move?( @game.board )).to eq true
+        end
+        it "return false if there are more moves to make" do
+            @game.board = {
+                a1: 'x', a2: 'o', a3: ' ',
+                b1: 'o', b2: ' ', b3: 'o',
+                c1: 'o', c2: 'o', c3: 'x'
+            }
+            expect(@game.no_more_move?( @game.board )).to eq false
+        end
+    end
+
 end
