@@ -11,10 +11,9 @@ class Ttt_game
         @board = nil
         @active_turn = nil
         @game_over = false
-        # if your can restart then it make sense to add score tracking
+
         @user_score = 0
         @cpu_score = 0
-        @choice = ''
     end
 
     def assign_player_symbo
@@ -33,7 +32,6 @@ class Ttt_game
     end
 
     def create_game
-        # the tic tac toe slots; After one game, if chose to play again this will clear the board
         @board = {
             a1: ' ', a2: ' ', a3: ' ',
             b1: ' ', b2: ' ', b3: ' ',
@@ -67,13 +65,9 @@ class Ttt_game
 
     def cpu_turn
         @active_turn = 'cpu'
-        availible_moves = @board.select { |_k, v| v == ' ' }
-        # if availible_moves.length < 9
-        #   minimax( @board, 0, @user_symbo)
-        #   @board[@choice] = @cpu_symbo
-        # else
-        # end
+        # move_location = minimax( @board, 0, @cpu_symbo)
 
+        availible_moves = @board.select { |_k, v| v == ' ' }
         move = availible_moves.keys.sample
         @board[move] = @cpu_symbo
 
@@ -99,64 +93,68 @@ class Ttt_game
         put_line
     end
 
+    # def no_more_move?(board)
+    #     board.select { |_k, v| v == ' ' }.empty? ? true : false
+    # end
 
-    def score(board, depth)
-        if win?(board, @cpu_symbo)
-            10 - depth
-        elsif win?(board, @user_symbo)
-            depth - 10
-        else
-            0
-        end
-    end
-
-    def no_more_move?(board)
-        board.select { |_k, v| v == ' ' }.empty? ? true : false
-    end
-
-    def minimax(board, depth, player)
-        # return score(board, depth) if no_more_move?(board)
-        if win?(board, @cpu_symbo)
-            return 10 - depth
-        elsif win?(board, @user_symbo)
-            return depth - 10
-        elsif no_more_move?(board)
-            return 0
-        end
-        depth += 1
-        scores = [] # an array of scores
-        moves = []  # an array of moves
-        best_move = { 'position' => -999 }
-        symbo = player == @user_symbo ? @cpu_symbo : @user_symbo
-        available_moves = board.select { |_k, v| v == ' ' }.keys
-        # Populate the scores array, recursing as needed
-        # p "this is pre loop #{depth}/////////////////////"
-        available_moves.each do |move|
-            # play that move, make new board
-            this_move = { move => symbo }
-            possible_board = board.merge(this_move)
-            # track the score from minimax when hit basecase
-            scores << minimax(possible_board, depth, symbo)
-            moves << move
-            # if game_score > best_move.values[0]
-            #   best_move = { move => game_score }
-            # end
-        end
-        # Do the min or the max calculation
-        # binding.pry
-        # if @active_turn == "user"
-        # This is the max calculation
-        max_score_index = scores.each_with_index.max[1]
-        @choice = moves[max_score_index]
-        puts 'i am here '
-        scores[max_score_index]
-      # else
-      #     # This is the min calculation
-      #     min_score_index = scores.each_with_index.min[1]
-      #     @choice = moves[min_score_index]
-      #     return scores[min_score_index]
-      # end
-    end
+    # def minimax(board, depth, symbol)
+    #     # return score(board, depth) if no_more_move?(board)
+    #     board_keys = board.keys.each_slice(1).to_a.flatten
+    #
+    #     if win?(board, @cpu_symbo)
+    #         # return positive numnber for cpu
+    #         return 10
+    #     elsif win?(board, @user_symbo)
+    #         # return negative number for player
+    #         return -10
+    #     elsif no_more_move?(board)
+    #         return 0
+    #     end
+    #
+    #     moves = []
+    #     best_move_index = 0
+    #
+    #     board_keys.each_with_index do |key,index|
+    #
+    #         new_board = board.clone
+    #
+    #         if new_board[key] == ' '
+    #
+    #             move = {}
+    #             new_board[key] = symbol
+    #             next_player = symbol == "X" ? "O" : "X"
+    #             move_value = minimax(new_board, depth + 1, next_player)
+    #             move[key] = move_value
+    #             moves.push(move)
+    #             # moves [{:c1=>10}]
+    #         end
+    #     end
+    #
+    #     best_move = ''
+    #     if (symbol == @cpu_symbo)
+    #         best_value = -1000
+    #
+    #         moves.each do |move|
+    #
+    #                 if ( move.values[0] > best_value)
+    #                     best_value = move.values[0]
+    #                     best_move = move.keys
+    #                 end
+    #
+    #         end
+    #     else
+    #         best_value = 1000
+    #         moves.each do |move|
+    #
+    #                 if ( move.values[0] < best_value)
+    #                     best_value = move.values[0]
+    #                     best_move = move.keys
+    #                 end
+    #
+    #         end
+    #     end
+    #     return moves[0][best_move[0]]
+    # end
 
     def wrong_input
         put_line
@@ -222,22 +220,6 @@ class Ttt_game
             @game_over = true
             ask_to_play_again
         end
-        # if @game_over == false
-        #     moves_remain = board.values.select { |v| v == ' ' }.length
-        #     if moves_remain > 0
-        #         # switch turn
-        #         if symbo == @user_symbo
-        #             cpu_turn
-        #         else
-        #             user_turn
-        #         end
-        #     else
-        #         put_line
-        #         draw_game
-        #         puts "\n Game Over -- DRAW!\n".blue
-        #         ask_to_play_again
-        #     end
-        # end
     end
 
     def ask_to_play_again
